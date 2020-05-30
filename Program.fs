@@ -7,8 +7,10 @@ type Volume = string
 type File = string
 
 module private Constants =
-    let imagesOnCamera = "DCIM/100EOS7D"
-    let rawsDirectory = "/Users/zaymonfoulds-cook/_Photos/Raws"
+    let onCameraImageLocation = "DCIM/100EOS7D"
+    let targetDirectory = "/Users/zaymonfoulds-cook/_Photos/Raws"
+    let supportedFileExtensions = [ ".cr2"; ".jpg"; ".mp4"; ".png" ]
+    let dateFormat = "yyyy-MM" // .NET DateTime Format String
 
 
 module Helpers =
@@ -48,7 +50,7 @@ module FileHelpers =
         |> List.ofSeq
 
     let loadFiles (v: Volume) : File list =
-        Directory.GetFiles(sprintf "%s/%s" v Constants.imagesOnCamera)
+        Directory.GetFiles(sprintf "%s/%s" v Constants.onCameraImageLocation)
         |> List.ofSeq
 
     let copyFile directoryToCopy (file: FileInfo) =
@@ -67,10 +69,10 @@ module FileHelpers =
             |> List.length
             |> fun x -> x + 1
 
-        let currentYear = DateTime.Now.Year
+        let dateSegment = DateTime.Now.ToString(Constants.dateFormat)
 
         {|
-            Directory = sprintf "%s/%d_%d_%s" Constants.rawsDirectory directoryNumber currentYear description
+            Directory = sprintf "%s/%d_%s_%s" Constants.targetDirectory directoryNumber dateSegment description
             FilesToCopy = fs
         |}
 
@@ -86,9 +88,7 @@ module Interaction =
 
         indexedVolumes |> printIndexedVolumes
 
-        readInt()
-        |> fun choice -> indexedVolumes.[choice]
-        |> snd
+        readInt() |> fun choice -> indexedVolumes.[choice] |> snd
 
     type Decision =
         | Yes
@@ -101,8 +101,10 @@ module Interaction =
         | _ -> say "Goodbye"; No
 
     let confirm (fs: File list) : FileInfo list option =
-        let fileExtensions = [ ".cr2"; ".jpg"; ".mp4"; ".png" ]
-        let supportedExtension (s: string) = fileExtensions |> List.exists (fun fileExtension -> s.Contains(fileExtension, StringComparison.InvariantCultureIgnoreCase))
+        let supportedExtension (s: string) =
+            Constants.supportedFileExtensions
+            |> List.exists (fun fileExtension ->
+                s.Contains(fileExtension, StringComparison.InvariantCultureIgnoreCase))
 
         let listToOption (l) =
             match l with
@@ -118,11 +120,9 @@ module Interaction =
             | Yes -> Some (mediaFiles |> List.map FileInfo)
             | No -> None)
 
-
     let getMediaSetDescription (fs: FileInfo list) =
         say "Please describe the set of images:"
         Console.ReadLine().Replace(" ", "_").ToUpperInvariant(), fs
-
 
 
 let workflow =
