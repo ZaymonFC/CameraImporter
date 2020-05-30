@@ -6,12 +6,19 @@ open System.IO
 type Volume = string
 type FileName = string
 
+type DescriptionCasing =
+    | UpperCase
+    | LowerCase
+
 module private Configuration =
     let onCameraImageLocation = "DCIM/100EOS7D"
     let targetDirectory = "/Users/zaymonfoulds-cook/_Photos/Raws"
     let supportedFileExtensions = [ ".cr2"; ".jpg"; ".mp4"; ".png" ]
+
     let dateFormat = "yyyy-MM" // .NET DateTime Format String
 
+    let descriptionCasing : DescriptionCasing = UpperCase
+    let descriptionSpaceReplacement : String = "_"
 
 module Helpers =
     let readInt = Console.ReadLine >> Int32.Parse
@@ -123,7 +130,14 @@ module Interaction =
 
     let getMediaSetDescription (fs: FileInfo list) =
         say "Please describe the set of images:"
-        Console.ReadLine().Replace(" ", "_").ToUpperInvariant(), fs
+        let description =
+            Console
+                .ReadLine()
+                .Replace(" ", Configuration.descriptionSpaceReplacement)
+
+        match Configuration.descriptionCasing with
+        | UpperCase -> description.ToUpperInvariant(), fs
+        | LowerCase -> description.ToLowerInvariant(), fs
 
 
 let workflow =
