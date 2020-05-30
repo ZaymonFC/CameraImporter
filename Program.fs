@@ -65,6 +65,7 @@ module FileHelpers =
         file.CopyTo(Path.Combine(directoryToCopy, file.Name)) |> ignore
 
     let copyFiles (x: {| Directory: string; FilesToCopy: FileInfo list |}) =
+        printfn "Created Directory: %s" x.Directory
         Directory.CreateDirectory(x.Directory) |> ignore
 
         x.FilesToCopy |> Helpers.iterWithProgress (copyFile x.Directory) "Copying"
@@ -155,6 +156,9 @@ let workflow =
 let main _argv =
     Printing.printHeading 0.1
 
-    workflow()
+    try
+        workflow()
+    with e ->
+        printfn "Error: %s" e.Message
 
     0 // return an integer exit code
