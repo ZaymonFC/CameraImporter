@@ -3,7 +3,7 @@
 This is a quick a dirty camera importer written in F# for MAC-OS
 
 ### Getting Started
-Change configuration at the top of `Program.fs` to suit your needs
+Change configuration at the top of `Program.fs` to suit your needs.
 
 ```fsharp
 module private Configuration =
@@ -11,6 +11,12 @@ module private Configuration =
     let targetDirectory = "/Users/zaymonfoulds-cook/_Photos/Raws"
     let supportedFileExtensions = [ ".cr2"; ".jpg"; ".mp4"; ".png" ]
     let dateFormat = "yyyy-MM" // .NET DateTime Format String
+```
+
+Camera importer will copy all files matching the supported file extension into a folder within `targetDirectory` in the format:
+
+```
+folder_number_<custom-date-pattern>_DESCRIPTION_IN_SCREAMING_SNAKE_CASE
 ```
 
 ### Running
