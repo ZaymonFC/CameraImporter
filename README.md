@@ -1,6 +1,6 @@
 # Camera Importer
 
-This is a quick a dirty camera importer written in F# for MAC-OS
+This is a quick a dirty interactive camera importer CLI written in F# for MAC-OS
 
 ### Getting Started
 Change configuration at the top of `Program.fs` to suit your needs.
