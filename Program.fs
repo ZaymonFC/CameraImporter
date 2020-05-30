@@ -4,9 +4,9 @@ open System
 open System.IO
 
 type Volume = string
-type File = string
+type FileName = string
 
-module private Constants =
+module private Configuration =
     let onCameraImageLocation = "DCIM/100EOS7D"
     let targetDirectory = "/Users/zaymonfoulds-cook/_Photos/Raws"
     let supportedFileExtensions = [ ".cr2"; ".jpg"; ".mp4"; ".png" ]
@@ -15,14 +15,15 @@ module private Constants =
 
 module Helpers =
     let readInt = Console.ReadLine >> Int32.Parse
-    let ( >=> ) (xo: 'a option) (f: 'a -> 'b option) = xo |> Option.bind f
 
     let iterWithProgress (f: 'a -> 'b) (operationName: string) (l: 'a list) =
         let totalLength = l |> List.length
 
-        l |> List.iteri (fun index element ->
+        l
+        |> List.iteri (fun index element ->
             printfn "%s %d out of %d" operationName (index + 1) totalLength
-            f element |> ignore)
+            f element |> ignore
+        )
 
 
 module Comparisons =
@@ -49,8 +50,8 @@ module FileHelpers =
         System.IO.Directory.EnumerateDirectories("/Volumes")
         |> List.ofSeq
 
-    let loadFiles (v: Volume) : File list =
-        Directory.GetFiles(sprintf "%s/%s" v Constants.onCameraImageLocation)
+    let loadFiles (v: Volume) : FileName list =
+        Directory.GetFiles(sprintf "%s/%s" v Configuration.onCameraImageLocation)
         |> List.ofSeq
 
     let copyFile directoryToCopy (file: FileInfo) =
@@ -69,10 +70,10 @@ module FileHelpers =
             |> List.length
             |> fun x -> x + 1
 
-        let dateSegment = DateTime.Now.ToString(Constants.dateFormat)
+        let dateSegment = DateTime.Now.ToString(Configuration.dateFormat)
 
         {|
-            Directory = sprintf "%s/%d_%s_%s" Constants.targetDirectory directoryNumber dateSegment description
+            Directory = sprintf "%s/%d_%s_%s" Configuration.targetDirectory directoryNumber dateSegment description
             FilesToCopy = fs
         |}
 
@@ -100,9 +101,9 @@ module Interaction =
         | InvariantEquals "Y" | InvariantEquals "Yes" -> Yes
         | _ -> say "Goodbye"; No
 
-    let confirm (fs: File list) : FileInfo list option =
+    let confirm (fs: FileName list) : FileInfo list option =
         let supportedExtension (s: string) =
-            Constants.supportedFileExtensions
+            Configuration.supportedFileExtensions
             |> List.exists (fun fileExtension ->
                 s.Contains(fileExtension, StringComparison.InvariantCultureIgnoreCase))
 
@@ -137,7 +138,7 @@ let workflow =
     >> ignore
 
 [<EntryPoint>]
-let main argv =
+let main _argv =
     Printing.printHeading 0.1
 
     workflow()
