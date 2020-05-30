@@ -20,7 +20,7 @@ module private Configuration =
 Camera importer will copy all files matching the supported file extension into a folder within `targetDirectory` in the format:
 
 ```
-folder_number_<custom-date-pattern>_DESCRIPTION_IN_SCREAMING_SNAKE_CASE
+folderNumber_<custom-date-pattern>_DESCRIPTION_IN_SPECIFIED_FORMAT
 ```
 
 ### Running
